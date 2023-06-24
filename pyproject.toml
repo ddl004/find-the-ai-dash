@@ -1,0 +1,29 @@
+[project]
+name = "Real or AI?"
+version = "1.0.0"
+description = "Real or AI game powered by Dash and ChatGPT"
+authors = [
+    {name = "ddl004"},
+]
+dependencies = [
+    "dash>=2.10.2",
+    "requests>=2.31.0",
+    "openai>=0.27.8",
+    "setuptools>=68.0.0",
+    "dash-mantine-components>=0.12.1",
+    "numpy>=1.25.0",
+    "dash-iconify>=0.1.2",
+    "diskcache>=5.6.1",
+    "tenacity>=8.2.2",
+]
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.3.2",
+    "pytest-mock>=3.11.1",
+    "ipython>=8.14.0",
+    "black>=23.3.0",
+    "flake8>=6.0.0",
+]

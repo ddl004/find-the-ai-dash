@@ -1,0 +1,62 @@
+[
+  {
+    "_id": "ON1bW99q0r",
+    "content": "With the new day comes new strength and new thoughts.",
+    "author": "Eleanor Roosevelt",
+    "tags": [
+      "Inspirational"
+    ],
+    "authorSlug": "eleanor-roosevelt",
+    "length": 53,
+    "dateAdded": "2020-12-10",
+    "dateModified": "2023-04-14"
+  },
+  {
+    "_id": "4Fw5Fu7aOG",
+    "content": "Dost thou love life? Then do not squander time, for that is the stuff life is made of.",
+    "author": "Benjamin Franklin",
+    "tags": [
+      "Wisdom"
+    ],
+    "authorSlug": "benjamin-franklin",
+    "length": 86,
+    "dateAdded": "2020-11-13",
+    "dateModified": "2023-04-14"
+  },
+  {
+    "_id": "z4yEYvKjp0T",
+    "content": "While we stop to think, we often miss our opportunity.",
+    "author": "Publilius Syrus",
+    "tags": [
+      "Famous Quotes"
+    ],
+    "authorSlug": "publilius-syrus",
+    "length": 54,
+    "dateAdded": "2021-01-11",
+    "dateModified": "2023-04-14"
+  },
+  {
+    "_id": "XnUCnSB3UYV",
+    "content": "Do one thing every day that scares you.",
+    "author": "Eleanor Roosevelt",
+    "tags": [
+      "Famous Quotes"
+    ],
+    "authorSlug": "eleanor-roosevelt",
+    "length": 39,
+    "dateAdded": "2020-07-10",
+    "dateModified": "2023-04-14"
+  },
+  {
+    "_id": "jE7hMG0Kts11",
+    "content": "A lot of people give up just before theyre about to make it. You know you never know when that next obstacle is going to be the last one.",
+    "author": "Chuck Norris",
+    "tags": [
+      "Famous Quotes"
+    ],
+    "authorSlug": "chuck-norris",
+    "length": 137,
+    "dateAdded": "2020-02-07",
+    "dateModified": "2023-04-14"
+  }
+]
