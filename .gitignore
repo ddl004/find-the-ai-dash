@@ -161,3 +161,4 @@ cython_debug/
 .pdm-python
 
 cache/
+test/*.db

@@ -3,6 +3,7 @@ import dash_mantine_components as dmc
 
 from datetime import datetime
 from dash import (
+    clientside_callback,
     Dash,
     html,
     dcc,
@@ -317,7 +318,62 @@ def load_next_frame(
     )
 
 
-@callback(
+clientside_callback(
+    """
+    function(
+        select_0,
+        select_1,
+        game_state
+    ) {
+        var DISPLAY = {
+            display: "block",
+        };
+        var HIDE = {
+            display: "none",
+        };
+        var output_submit = window.dash_clientside.no_update;
+        var submit_disabled = false;
+        var output_checks = [
+            window.dash_clientside.no_update,
+            window.dash_clientside.no_update
+        ];
+        var output_styles = [
+            window.dash_clientside.no_update,
+            window.dash_clientside.no_update
+        ];
+        var triggered = dash_clientside.callback_context.triggered[0].prop_id
+
+        if (game_state && game_state.current_frame % 2 === 0) {
+            output_submit = "Submit";
+            output_styles = [DISPLAY, DISPLAY];
+            if (!select_0 && !select_1) {
+                submit_disabled = true;
+            }
+            if (triggered === "select-0.checked") {
+                output_checks[0] = select_0;
+                output_checks[1] = false;
+            } else if (triggered === "select-1.checked") {
+                output_checks[0] = false;
+                output_checks[1] = select_1;
+            }
+        } else if (!game_state) {
+            // no action needed
+        } else {
+            output_submit = "Next";
+            output_checks = [false, false];
+            output_styles = [HIDE, HIDE];
+        }
+
+        return [
+            output_submit,
+            submit_disabled,
+            output_checks[0],
+            output_checks[1],
+            output_styles[0],
+            output_styles[1]
+        ];
+    }
+    """,
     Output("submit-button", "children"),
     Output("submit-button", "disabled"),
     Output("select-0", "checked"),
@@ -327,40 +383,7 @@ def load_next_frame(
     Input("select-0", "checked"),
     Input("select-1", "checked"),
     Input("game-state", "data"),
-    prevent_initial_call=True,
 )
-def update_button_state(select_0, select_1, game_state):
-    output_submit = no_update
-    submit_disabled = False
-    output_checks = [no_update, no_update]
-    output_styles = [no_update, no_update]
-
-    if game_state and game_state["current_frame"] % 2 == 0:
-        output_submit = "Submit"
-        output_styles = [DISPLAY, DISPLAY]
-        if not select_0 and not select_1:
-            submit_disabled = True
-        if ctx.triggered_id == "select-0":
-            output_checks[0] = select_0
-            output_checks[1] = False
-        elif ctx.triggered_id == "select-1":
-            output_checks[0] = False
-            output_checks[1] = select_1
-    elif not game_state:
-        pass
-    else:
-        output_submit = "Next"
-        output_checks = [False, False]
-        output_styles = [HIDE, HIDE]
-
-    return (
-        output_submit,
-        submit_disabled,
-        output_checks[0],
-        output_checks[1],
-        output_styles[0],
-        output_styles[1],
-    )
 
 
 def _get_results_div(results: t.List[tuple]):
