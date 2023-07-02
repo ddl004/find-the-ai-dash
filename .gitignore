@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 .env
+.OPENAI_API_KEY
 .venv
 env/
 venv/

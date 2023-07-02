@@ -7,7 +7,7 @@ from pathlib import Path
 from diskcache import Cache
 
 parent_dir = Path(__file__).resolve().parent.parent
-env_path = parent_dir / ".env"
+env_path = parent_dir / ".OPENAI_API_KEY"
 openai.api_key_path = env_path
 
 URL = "https://api.quotable.io/quotes/random"
