@@ -12,7 +12,6 @@ from dash import (
     Input,
     State,
     no_update,
-    ctx,
 )
 from dash_iconify import DashIconify
 from dash_app.quotes import get_question_pairs
@@ -223,102 +222,8 @@ def load_game_state(acknowledge_clicks, game_state):
 
 
 @callback(
-    Output("quote-0", "children"),
-    Output("quote-1", "children"),
-    Output("quote-0", "cite"),
-    Output("quote-1", "cite"),
-    Output("card-0", "style"),
-    Output("card-1", "style"),
-    Output("submit-button", "style"),
-    Output("progress-bar", "value"),
-    Output("end-content", "style"),
-    Output("game-state", "data", allow_duplicate=True),
-    Input("initial-content", "style"),
-    Input("submit-button", "n_clicks"),
-    Input("end-button", "n_clicks"),
-    State("game-state", "data"),
-    State("select-0", "checked"),
-    State("select-1", "checked"),
-    prevent_initial_call=True,
-)
-def load_next_frame(
-    initial_content, submit_clicks, end_clicks, game_state, select_0, select_1
-):
-    output_cites = [None, None]
-    output_card_styles = [CARD_STYLE, CARD_STYLE]
-    output_submit_style = no_update
-    output_end_style = no_update
-
-    if ctx.triggered_id == "submit-button":
-        game_state["current_frame"] += 1
-    elif ctx.triggered_id == "end-button":
-        game_state["current_frame"] = 0
-        game_state["results"] = [None] * QUOTES_PER_DAY
-        output_end_style = HIDE
-        output_submit_style = DISPLAY
-
-    current_frame = game_state["current_frame"]
-    # Out of questions
-    if current_frame >= (QUOTES_PER_DAY * 2):
-        # Reset game state
-        output_quotes = [{"content": no_update}, {"content": no_update}]
-        output_card_styles = [HIDE, HIDE]
-        output_submit_style = HIDE
-        output_end_style = DISPLAY
-
-    # Pending answer
-    elif game_state["current_frame"] % 2 == 0:
-        output_quotes = game_state["question_pairs"][(current_frame // 2)]
-    # Result
-    else:
-        current_pair = game_state["question_pairs"][current_frame // 2]
-        output_quotes = current_pair
-
-        if not select_0 and not select_1:
-            choice, correct = game_state["results"][current_frame // 2]
-        else:
-            choice = 0 if select_0 else 1
-            correct = current_pair[choice]["type"] == "ai"
-
-        if correct:
-            output_card_styles[choice] = {
-                **CARD_STYLE,
-                "backgroundColor": "#dcfce7",
-            }
-            game_state["results"][current_frame // 2] = (choice, True)
-        else:
-            output_card_styles[choice] = {
-                **CARD_STYLE,
-                "backgroundColor": "#fee2e2",
-            }
-            game_state["results"][current_frame // 2] = (choice, False)
-
-        for idx in [0, 1]:
-            output_cites[idx] = (
-                "- ChatGPT"
-                if current_pair[idx]["type"] == "ai"
-                else f"- {current_pair[idx]['author']}"
-            )
-
-    return (
-        output_quotes[0]["content"],
-        output_quotes[1]["content"],
-        output_cites[0],
-        output_cites[1],
-        output_card_styles[0],
-        output_card_styles[1],
-        output_submit_style,
-        100 * ((current_frame // 2) / QUOTES_PER_DAY),
-        output_end_style,
-        game_state,
-    )
-
-
-@callback(
     Output("results-div", "children"),
     Input("game-state", "data"),
-    State("select-0", "checked"),
-    State("select-1", "checked"),
     prevent_initial_call=True,
 )
 def load_results_div(game_state):
@@ -343,11 +248,125 @@ def load_results_div(game_state):
             align="center",
         )
 
-    current_frame = game_state["current_frame"]
-    if current_frame >= (QUOTES_PER_DAY * 2):
-        return _get_results_div(game_state["results"])
+    if game_state:
+        current_frame = game_state["current_frame"]
+        if current_frame >= (QUOTES_PER_DAY * 2):
+            return _get_results_div(game_state["results"])
 
     return no_update
+
+
+clientside_callback(
+    """
+    function load_next_frame(
+        initial_content, submit_clicks, end_clicks, game_state, select_0, select_1
+    ) {
+        const QUOTES_PER_DAY = 10
+        const DISPLAY = {
+            display: "block",
+        };
+        const HIDE = {
+            display: "none",
+        };
+        const CARD_STYLE = {
+            minHeight: "32vh"
+        };
+        const triggered = dash_clientside.callback_context.triggered[0].prop_id
+
+        var output_cites = [null, null];
+        var output_card_styles = [CARD_STYLE, CARD_STYLE];
+        var output_quotes = [{ content: null }, { content: null }];
+        var output_submit_style = window.dash_clientside.no_update;
+        var output_end_style = window.dash_clientside.no_update;
+
+        if (triggered === "submit-button.n_clicks") {
+            game_state.current_frame += 1;
+        } else if (triggered === "end-button.n_clicks") {
+            game_state.current_frame = 0;
+            game_state.results = new Array(QUOTES_PER_DAY).fill(null);
+            output_end_style = HIDE;
+            output_submit_style = DISPLAY;
+        }
+
+        // Out of questions
+        var current_frame = game_state.current_frame
+        var current_pair = game_state.question_pairs[~~(current_frame / 2)];
+        if (current_frame >= QUOTES_PER_DAY * 2) {
+            // Reset game state
+            output_card_styles = [HIDE, HIDE];
+            output_submit_style = HIDE;
+            output_end_style = DISPLAY;
+        }
+        // Pending answer
+        else if (current_frame % 2 === 0) {
+            // output_quotes = game_state.question_pairs[~~(current_frame / 2)];
+            output_quotes = current_pair;
+        }
+        // Result
+        else {
+            output_quotes = current_pair;
+
+            let choice, correct;
+            if (!select_0 && !select_1) {
+                [choice, correct] = game_state.results[~~(current_frame / 2)];
+            } else {
+                choice = select_0 ? 0 : 1;
+                correct = current_pair[choice].type === "ai";
+            }
+
+            if (correct) {
+                output_card_styles[choice] = {
+                    ...CARD_STYLE,
+                    backgroundColor: "#dcfce7"
+                };
+                game_state.results[~~(current_frame / 2)] = [choice, true];
+            } else {
+                output_card_styles[choice] = {
+                    ...CARD_STYLE,
+                    backgroundColor: "#fee2e2"
+                };
+                game_state.results[~~(current_frame / 2)] = [choice, false];
+            }
+
+            for (let idx of [0, 1]) {
+                output_cites[idx] = current_pair[idx].type === "ai"
+                    ? "- ChatGPT"
+                    : "- " + current_pair[idx].author;
+            }
+        }
+
+        return [
+            output_quotes[0]?.content,
+            output_quotes[1]?.content,
+            output_cites[0],
+            output_cites[1],
+            output_card_styles[0],
+            output_card_styles[1],
+            output_submit_style,
+            100 * (current_frame / (QUOTES_PER_DAY * 2)),
+            output_end_style,
+            game_state
+        ];
+    }
+    """,
+    Output("quote-0", "children"),
+    Output("quote-1", "children"),
+    Output("quote-0", "cite"),
+    Output("quote-1", "cite"),
+    Output("card-0", "style"),
+    Output("card-1", "style"),
+    Output("submit-button", "style"),
+    Output("progress-bar", "value"),
+    Output("end-content", "style"),
+    Output("game-state", "data", allow_duplicate=True),
+    Input("initial-content", "style"),
+    Input("submit-button", "n_clicks"),
+    Input("end-button", "n_clicks"),
+    State("game-state", "data"),
+    State("select-0", "checked"),
+    State("select-1", "checked"),
+    prevent_initial_call=True,
+)
 
 
 clientside_callback(
@@ -357,12 +376,13 @@ clientside_callback(
         select_1,
         game_state
     ) {
-        var DISPLAY = {
+        const DISPLAY = {
             display: "block",
         };
-        var HIDE = {
+        const HIDE = {
             display: "none",
         };
+        const triggered = dash_clientside.callback_context.triggered[0].prop_id
         var output_submit = window.dash_clientside.no_update;
         var submit_disabled = false;
         var output_checks = [
@@ -373,7 +393,6 @@ clientside_callback(
             window.dash_clientside.no_update,
             window.dash_clientside.no_update
         ];
-        var triggered = dash_clientside.callback_context.triggered[0].prop_id
 
         if (game_state && game_state.current_frame % 2 === 0) {
             output_submit = "Submit";
