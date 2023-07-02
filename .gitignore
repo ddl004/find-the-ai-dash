@@ -160,5 +160,5 @@ cython_debug/
 #.idea/
 .pdm-python
 
-cache/
+cache/cache.db
 test/*.db

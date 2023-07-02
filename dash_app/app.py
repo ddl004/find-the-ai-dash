@@ -232,7 +232,6 @@ def load_game_state(acknowledge_clicks, game_state):
     Output("submit-button", "style"),
     Output("progress-bar", "value"),
     Output("end-content", "style"),
-    Output("results-div", "children"),
     Output("game-state", "data", allow_duplicate=True),
     Input("initial-content", "style"),
     Input("submit-button", "n_clicks"),
@@ -249,7 +248,6 @@ def load_next_frame(
     output_card_styles = [CARD_STYLE, CARD_STYLE]
     output_submit_style = no_update
     output_end_style = no_update
-    output_results = no_update
 
     if ctx.triggered_id == "submit-button":
         game_state["current_frame"] += 1
@@ -267,7 +265,6 @@ def load_next_frame(
         output_card_styles = [HIDE, HIDE]
         output_submit_style = HIDE
         output_end_style = DISPLAY
-        output_results = _get_results_div(game_state["results"])
 
     # Pending answer
     elif game_state["current_frame"] % 2 == 0:
@@ -313,9 +310,44 @@ def load_next_frame(
         output_submit_style,
         100 * ((current_frame // 2) / QUOTES_PER_DAY),
         output_end_style,
-        output_results,
         game_state,
     )
+
+
+@callback(
+    Output("results-div", "children"),
+    Input("game-state", "data"),
+    State("select-0", "checked"),
+    State("select-1", "checked"),
+    prevent_initial_call=True,
+)
+def load_results_div(game_state):
+    def _get_results_div(results):
+        num_correct = sum([result[1] for result in results])
+        percentage = int((100 * num_correct) / QUOTES_PER_DAY)
+        return dmc.Stack(
+            [
+                dmc.RingProgress(
+                    sections=[{"value": percentage, "color": "indigo"}],
+                    label=dmc.Center(
+                        dmc.Text(f"{percentage}%", color="indigo")
+                    ),
+                ),
+                dmc.Alert(
+                    f"You got {num_correct} out of {QUOTES_PER_DAY}"
+                    " quotes correct!",
+                    title="Congratulations!",
+                    color="green",
+                ),
+            ],
+            align="center",
+        )
+
+    current_frame = game_state["current_frame"]
+    if current_frame >= (QUOTES_PER_DAY * 2):
+        return _get_results_div(game_state["results"])
+
+    return no_update
 
 
 clientside_callback(
@@ -384,26 +416,6 @@ clientside_callback(
     Input("select-1", "checked"),
     Input("game-state", "data"),
 )
-
-
-def _get_results_div(results: t.List[tuple]):
-    num_correct = sum([result[1] for result in results])
-    percentage = int((100 * num_correct) / QUOTES_PER_DAY)
-    return dmc.Stack(
-        [
-            dmc.RingProgress(
-                sections=[{"value": percentage, "color": "indigo"}],
-                label=dmc.Center(dmc.Text(f"{percentage}%", color="indigo")),
-            ),
-            dmc.Alert(
-                f"You got {num_correct} out of {QUOTES_PER_DAY}"
-                " quotes correct!",
-                title="Congratulations!",
-                color="green",
-            ),
-        ],
-        align="center",
-    )
 
 
 if __name__ == "__main__":
