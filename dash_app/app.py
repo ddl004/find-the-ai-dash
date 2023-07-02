@@ -173,7 +173,7 @@ app.layout = dmc.MantineProvider(
             [
                 dcc.Store(id="game-state", storage_type="local"),
                 dmc.Space(h=10),
-                dmc.Title("Find the AI", style={"height": "10vh"}),
+                dmc.Image(src="/assets/logo.png", height="104px", width="177px"),
                 dmc.LoadingOverlay(
                     html.Div(id="loading-content", children=initial_content),
                     loaderProps={"variant": "dots", "size": "xl"},
