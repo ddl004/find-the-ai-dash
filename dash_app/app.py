@@ -21,7 +21,7 @@ from dash_app.quotes import get_question_pairs
 QUOTES_PER_DAY = 10
 HIDE = {"display": "none"}
 DISPLAY = {"display": "block"}
-CARD_STYLE = {"minHeight": "32vh"}
+CARD_STYLE = {"minHeight": "30vh"}
 
 
 app = Dash(__name__)
@@ -173,14 +173,16 @@ app.layout = dmc.MantineProvider(
             [
                 dcc.Store(id="game-state", storage_type="local"),
                 dmc.Space(h=10),
-                dmc.Image(src="/assets/logo.png", height="104px", width="177px"),
+                dmc.Image(
+                    src="/assets/logo.png", height="104px", width="177px"
+                ),
                 dmc.LoadingOverlay(
                     html.Div(id="loading-content", children=initial_content),
                     loaderProps={"variant": "dots", "size": "xl"},
                 ),
                 content,
                 end_content,
-                dmc.Space(h=10),
+                dmc.Space(h=5),
             ],
             align="center",
         ),
