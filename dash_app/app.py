@@ -1,4 +1,3 @@
-import typing as t
 import dash_mantine_components as dmc
 
 from datetime import datetime
@@ -201,14 +200,14 @@ app.layout = dmc.MantineProvider(
     State("game-state", "data"),
     prevent_initial_call=True,
 )
-def load_game_state(acknowledge_clicks, game_state):
+def load_game_state(acknowledge_clicks: int, game_state: dict):
     """
     Callback function for initializing or loading the game state
     and transitioning out of the introduction frame.
 
     Args:
         acknowledge_clicks (int): The number of times the acknowledge-button
-                has been clicked.
+            has been clicked.
         game_state (dict): The game-state stored in local storage containing
             the user's progress.
 
@@ -246,7 +245,7 @@ def load_game_state(acknowledge_clicks, game_state):
     Input("game-state", "data"),
     prevent_initial_call=True,
 )
-def load_results_div(game_state):
+def load_results_div(game_state: dict):
     """
     Callback function for loading and displaying the results div.
 
@@ -258,6 +257,7 @@ def load_results_div(game_state):
         tuple or dash.no_update: End frame when game is over.
             Otherwise, dash.no_update to prevent unnecessary updates.
     """
+
     def _get_results_div(results):
         num_correct = sum([result[1] for result in results])
         percentage = int((100 * num_correct) / QUOTES_PER_DAY)

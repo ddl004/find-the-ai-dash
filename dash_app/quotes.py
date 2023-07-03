@@ -1,6 +1,7 @@
 import logging
 import requests
 import openai
+import typing as t
 import tenacity
 
 from pathlib import Path
@@ -30,7 +31,7 @@ def get_random_quotes(
     Returns:
         list or None: A list of randomly retrieved quotes in JSON format, or
             None if an error occurs.
-    """:
+    """
     params = {
         "limit": limit,
         "maxLength": maxLength,
@@ -49,7 +50,7 @@ def get_random_quotes(
         return None
 
 
-def generate_ai_quotes(quotes):
+def generate_ai_quotes(quotes: t.List[dict]):
     """
     Generates summarized quotes from OpenAI API. Checks diskcache.Cache
     before querying the API.
@@ -60,6 +61,7 @@ def generate_ai_quotes(quotes):
     Returns:
         list: A list of AI-generated quotes in JSON format.
     """
+
     @tenacity.retry(
         wait=tenacity.wait_exponential(max=30),
         stop=tenacity.stop_after_attempt(4),
