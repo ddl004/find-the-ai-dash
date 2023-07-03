@@ -1,9 +1,8 @@
 import json
-import shutil
 import tempfile
 
 from seed import populate_quotes
-from unittest import mock
+from diskcache import Cache
 
 
 def sample_quotes(quote_type):
@@ -25,6 +24,10 @@ def test_populate_quotes(mocker):
         )
         mocker.patch("seed.CACHE_PATH", temp_dir.name)
         result = populate_quotes()
+
         assert result
+        with Cache(temp_dir.name) as store:
+            question_pairs = store.get("question_pairs")
+            assert len(question_pairs) == 5
     finally:
         temp_dir.cleanup()

@@ -17,6 +17,20 @@ CACHE_PATH = parent_dir / "cache"
 def get_random_quotes(
     limit=1, maxLength=None, minLength=None, tags=None, authors=None
 ):
+    """
+    Retrieves random quotes from Quotable API.
+
+    Args:
+        limit (int): The maximum number of quotes to retrieve. Defaults to 1.
+        maxLength (int): The maximum length of the quotes in characters.
+        minLength (int): The minimum length of the quotes in characters.
+        tags (list): A list of tags to filter the quotes by.
+        authors (list): A list of authors to filter the quotes by.
+
+    Returns:
+        list or None: A list of randomly retrieved quotes in JSON format, or
+            None if an error occurs.
+    """:
     params = {
         "limit": limit,
         "maxLength": maxLength,
@@ -36,6 +50,16 @@ def get_random_quotes(
 
 
 def generate_ai_quotes(quotes):
+    """
+    Generates summarized quotes from OpenAI API. Checks diskcache.Cache
+    before querying the API.
+
+    Args:
+        quotes (list): A list of quotes to be summarized
+
+    Returns:
+        list: A list of AI-generated quotes in JSON format.
+    """
     @tenacity.retry(
         wait=tenacity.wait_exponential(max=30),
         stop=tenacity.stop_after_attempt(4),
@@ -87,6 +111,12 @@ def generate_ai_quotes(quotes):
 
 
 def get_question_pairs():
+    """
+    Retrieves today's question pairs from a cache.
+
+    Returns:
+        list: A list of question pairs.
+    """
     question_pairs = []
     with Cache(CACHE_PATH) as store:
         question_pairs = store.get("question_pairs")

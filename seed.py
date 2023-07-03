@@ -7,6 +7,13 @@ from dash_app.app import QUOTES_PER_DAY
 
 
 def populate_quotes():
+    """
+    Creates question pairs of randomly shuffled question pairs from
+    humans and AI, and updates the cache for today's questions.
+
+    Returns:
+        bool: True if the quotes are successfully populated and cached.
+    """
     human_quotes = get_random_quotes(QUOTES_PER_DAY)
     ai_quotes = generate_ai_quotes(human_quotes)
     question_pairs = list(

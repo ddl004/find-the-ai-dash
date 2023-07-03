@@ -26,8 +26,10 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
             var output_submit_style = window.dash_clientside.no_update;
             var output_end_style = window.dash_clientside.no_update;
 
+            // Pending answer
             if (triggered === "submit-button.n_clicks") {
                 game_state.current_frame += 1;
+            // Reset game state
             } else if (triggered === "end-button.n_clicks") {
                 game_state.current_frame = 0;
                 game_state.results = new Array(QUOTES_PER_DAY).fill(null);
@@ -55,6 +57,7 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                 let choice, correct;
                 if (!select_0 && !select_1) {
                     [choice, correct] = game_state.results[~~(current_frame / 2)];
+                // User is correct if they chose the AI generated quote
                 } else {
                     choice = select_0 ? 0 : 1;
                     correct = current_pair[choice].type === "ai";
@@ -63,12 +66,14 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                 if (correct) {
                     output_card_styles[choice] = {
                         ...CARD_STYLE,
+                        // Green
                         backgroundColor: "#dcfce7"
                     };
                     game_state.results[~~(current_frame / 2)] = [choice, true];
                 } else {
                     output_card_styles[choice] = {
                         ...CARD_STYLE,
+                        // Red
                         backgroundColor: "#fee2e2"
                     };
                     game_state.results[~~(current_frame / 2)] = [choice, false];
