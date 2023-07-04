@@ -102,7 +102,7 @@ def generate_ai_quotes(quotes: t.List[dict]):
                     .replace("!", ".")
                     .rstrip()
                 )
-                if stripped[-1] != ".":
+                if stripped[-1] not in (".", "?"):
                     stripped += "."
 
                 chat_completion.choices[0]["message"]["content"] = stripped
